@@ -2,9 +2,9 @@ package com.company.community.community.controller;
 
 import com.company.community.community.dto.AccessTokenDTO;
 import com.company.community.community.dto.GithubUser;
-import com.company.community.community.mapper.UserMapper;
 import com.company.community.community.model.User;
 import com.company.community.community.provider.GithubProvider;
+import com.company.community.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 @Controller
@@ -23,7 +23,7 @@ public class AuthorizeController {
     private GithubProvider githubProvider;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Value("${github.client.id}")
     private String clientId;
@@ -36,7 +36,6 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
-                           HttpSession httpSession,
                            HttpServletResponse response){
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(clientId);
@@ -55,16 +54,22 @@ public class AuthorizeController {
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl(githubUser.getAvatarUrl());
-            userMapper.insertUser(user);
+            userService.insertOrUpdate(user);
             response.addCookie(new Cookie("token",token));
-            //登录成功，进行session和cookie
-            httpSession.setAttribute("user",githubUser);
             return "redirect:/";
         }else{
             //登录失败，重新登录
             return "redirect:/";
         }
+    }
 
-
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        request.getSession().removeAttribute("user");
+        Cookie cookie = new Cookie("token",null);
+        response.addCookie(cookie);
+        cookie.setMaxAge(0);
+        return "redirect:/";
     }
 }
