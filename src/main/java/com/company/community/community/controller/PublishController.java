@@ -19,14 +19,14 @@ public class PublishController {
 
     @Autowired QuestionService questionService;
 
-    @GetMapping("/publish/{questionId}")
-    public String edit(@PathVariable(name = "questionId") Integer questionId,
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable(name = "id") Integer id,
                        Model model){
-        QuestionDTO question = questionService.getQuestionById(questionId);
+        QuestionDTO question = questionService.getQuestionById(id);
         model.addAttribute("title",question.getTitle());
         model.addAttribute("description",question.getDescription());
         model.addAttribute("tag",question.getTag());
-        model.addAttribute("questionId",question.getId());
+        model.addAttribute("id",question.getId());
         return "publish";
     }
 
@@ -40,7 +40,7 @@ public class PublishController {
             @RequestParam("title") String title,
             @RequestParam("description") String desctiption,
             @RequestParam("tag") String tag,
-            @RequestParam("questionId") Integer questionId,
+            @RequestParam("id") Integer id,
             HttpServletRequest request,
             Model model){
 
@@ -73,7 +73,7 @@ public class PublishController {
         question.setDescription(desctiption);
         question.setTag(tag);
         question.setCreatorId(user.getId());
-        question.setId(questionId);
+        question.setId(id);
         questionService.createOrUpdateQuestion(question);
         return "redirect:/";
     }
