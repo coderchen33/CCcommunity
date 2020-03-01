@@ -124,9 +124,15 @@ public class QuestionService {
 
     public void createOrUpdateQuestion(Question question) {
         if(question.getId()==null){
-            question.setGmtCreate(System.currentTimeMillis());
-            question.setGmtModified(question.getGmtCreate());
-            questionMapper.insert(question);
+            Question insertQuestion = new Question();
+            insertQuestion.setGmtCreate(System.currentTimeMillis());
+            insertQuestion.setGmtModified(System.currentTimeMillis());
+            insertQuestion.setGmtModified(question.getGmtCreate());
+            insertQuestion.setTitle(question.getTitle());
+            insertQuestion.setDescription(question.getDescription());
+            insertQuestion.setTag(question.getTag());
+            insertQuestion.setCreatorId(question.getCreatorId());
+            questionMapper.insertSelective(insertQuestion);
         }else{
             Question updateQuestion = new Question();
             updateQuestion.setTitle(question.getTitle());

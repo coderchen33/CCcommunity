@@ -1,7 +1,7 @@
 package com.company.community.community.advice;
 
 import com.alibaba.fastjson.JSON;
-import com.company.community.community.dto.resultDTO;
+import com.company.community.community.dto.ResultDTO;
 import com.company.community.community.exception.CustomizeErrorCode;
 import com.company.community.community.exception.CustomizeException;
 import org.springframework.ui.Model;
@@ -24,7 +24,7 @@ public class CustomizeExceptionHandler {
 
         String contentType = request.getContentType();
         if("application/json".equals(contentType)){
-            resultDTO resultDTO = null;
+            ResultDTO resultDTO = null;
             //返回JSON
             if(ex instanceof CustomizeException){
                 resultDTO =  resultDTO.errorOf((CustomizeException) ex);

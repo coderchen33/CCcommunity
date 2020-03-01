@@ -1,19 +1,20 @@
 package com.company.community.community.controller;
 
+import com.company.community.community.dto.CommentCreateDTO;
 import com.company.community.community.dto.CommentDTO;
-import com.company.community.community.dto.resultDTO;
+import com.company.community.community.dto.ResultDTO;
+import com.company.community.community.enums.CommentTypeEnum;
 import com.company.community.community.exception.CustomizeErrorCode;
 import com.company.community.community.model.Comment;
 import com.company.community.community.model.User;
 import com.company.community.community.service.CommentService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class CommentController {
@@ -23,11 +24,15 @@ public class CommentController {
 
     @ResponseBody
     @RequestMapping(value = "/comment",method = RequestMethod.POST)
-    public Object postComment(@RequestBody CommentDTO commentDTO,
+    public Object postComment(@RequestBody CommentCreateDTO commentDTO,
                               HttpSession session){
         User user =(User)session.getAttribute("user");
         if(user == null){
-            return resultDTO.errorOf(CustomizeErrorCode.NO_LOGIN);
+            return ResultDTO.errorOf(CustomizeErrorCode.NO_LOGIN);
+        }
+
+        if(commentDTO==null || StringUtils.isBlank(commentDTO.getContent())){
+            return ResultDTO.errorOf(CustomizeErrorCode.CONTENT_IS_EMPTY);
         }
         Comment comment = new Comment();
         comment.setParentId(commentDTO.getParentId());
@@ -37,6 +42,13 @@ public class CommentController {
         comment.setGmtModified(System.currentTimeMillis());
         comment.setCommentator(user.getId());
         commentService.insert(comment);
-        return resultDTO.okOf();
+        return ResultDTO.okOf();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/comment/{id}",method = RequestMethod.GET)
+    public ResultDTO<List<CommentDTO>> comments(@PathVariable(name = "id") Long id){
+        List<CommentDTO> commentDTOS = commentService.listByTargetId(id, CommentTypeEnum.COMMENT);
+        return ResultDTO.okOf(commentDTOS);
     }
 }
