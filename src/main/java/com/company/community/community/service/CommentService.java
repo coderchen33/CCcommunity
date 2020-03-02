@@ -4,10 +4,7 @@ import com.company.community.community.dto.CommentDTO;
 import com.company.community.community.enums.CommentTypeEnum;
 import com.company.community.community.exception.CustomizeException;
 import com.company.community.community.exception.CustomizeErrorCode;
-import com.company.community.community.mapper.CommentMapper;
-import com.company.community.community.mapper.QuestionExtMapper;
-import com.company.community.community.mapper.QuestionMapper;
-import com.company.community.community.mapper.UserMapper;
+import com.company.community.community.mapper.*;
 import com.company.community.community.model.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,9 @@ public class CommentService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CommentExtMapper commentExtMapper;
+
     @Transactional
     public void insert(Comment comment) {
         if(comment.getParentId()==null || comment.getParentId()==0){
@@ -47,10 +47,15 @@ public class CommentService {
         if(comment.getType()==CommentTypeEnum.COMMENT.getType()){
             //回复评论
             Comment dbComment = commentMapper.selectByPrimaryKey(comment.getParentId());
-            if(dbComment != null){
+            if(dbComment == null){
                 throw new CustomizeException(CustomizeErrorCode.COMMENT_NOT_FOUND);
             }
             commentMapper.insert(comment);
+            //增加评论数
+            Comment parentComment = new Comment();
+            parentComment.setId(comment.getParentId());
+            parentComment.setCommentCount(1);
+            commentExtMapper.incCommentCount(parentComment);
         }else{
             //回复问题
             Question question = questionMapper.selectByPrimaryKey(comment.getParentId());

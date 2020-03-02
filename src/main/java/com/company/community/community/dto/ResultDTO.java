@@ -35,7 +35,7 @@ public class ResultDTO<T> {
     public static <T> ResultDTO okOf(T t) {
         ResultDTO resultDTO = new ResultDTO();
         resultDTO.setCode(200);
-        resultDTO.setMessage("登录成功");
+        resultDTO.setMessage("请求成功");
         resultDTO.setData(t);
         return resultDTO;
     }

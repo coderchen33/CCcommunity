@@ -29,7 +29,6 @@ body{
     margin-top: 15px;
 }
 .community-menu {
-    display: block;
     color: #999;
     font-size: 13px;
     margin-bottom: 15px;
@@ -87,4 +86,31 @@ body{
 
 .question-title {
     margin-top: 25px;
+}
+
+.question-tag {
+    margin-right: 5px;
+}
+
+.question-related {
+    line-height: 25px;
+    font-size: 13px;
+    margin-left: 0;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.related-topic {
+    margin-top: 20px;
+}
+
+.publish-tag-tab {
+    display: none;
+    margin-top: 10px;
+}
+
+.publish-tag-tab .label-info {
+    white-space: normal;
+    margin: 5px 5px;
+    display: inline-block;
 }
